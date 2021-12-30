@@ -24,8 +24,9 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
 
     @Override
     public void process(Object message) {
-
     }
+
+
 
     @Override
     public boolean shouldTerminate() {
