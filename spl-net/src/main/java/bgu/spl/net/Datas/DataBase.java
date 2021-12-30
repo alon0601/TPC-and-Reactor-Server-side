@@ -27,6 +27,7 @@ public class DataBase {
         if(user == null || user.getLog())
             return false;
         user.logIn();
+        loggedInUsers.add(userName);
         return true;
     }
 
@@ -35,6 +36,7 @@ public class DataBase {
         if(user == null || !user.getLog())
             return false;
         user.logOut();
+        loggedInUsers.remove(userName);
         return true;
     }
 
@@ -76,6 +78,10 @@ public class DataBase {
             return false;
         user.addPMMsg(content);
         return true;
+    }
+
+    public Queue<String> connectedUsers(){
+        return loggedInUsers;
     }
 
 }
