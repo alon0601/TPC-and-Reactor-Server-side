@@ -29,6 +29,6 @@ public class PmMessage implements Message{
 
     @Override
     public void act(BidiMessagingProtocolImp myProtocol) {
-        myProtocol.PM();
+        myProtocol.PM(this.opcode,this.userName,this.content);
     }
 }

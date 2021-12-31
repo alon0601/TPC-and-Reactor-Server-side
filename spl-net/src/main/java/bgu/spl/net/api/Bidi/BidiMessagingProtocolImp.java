@@ -128,13 +128,12 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         return name;
     }
 
-    public void logIn(String userName,String password){
+    public void logIn(short opcode,String userName,String password){
         this.userName = userName;
         boolean work = true;
-        Integer opcode = 2;
         work = dataBase.logInRe(userName,password);
         if(work) {
-            connections.send(myId, new Ack(opcode.shortValue()));
+            connections.send(myId, new Ack(opcode));
             User user =this.dataBase.getUser(this.userName);
             for(Message msg:user.getWaitingMessages()){
                 connections.send(myId, new Ack(msg.getOpcode()));
