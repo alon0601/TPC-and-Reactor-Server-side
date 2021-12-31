@@ -1,6 +1,7 @@
 package bgu.spl.net.api.Bidi.Messages;
 
 import bgu.spl.net.api.Bidi.BidiMessagingProtocol;
+import bgu.spl.net.api.Bidi.BidiMessagingProtocolImp;
 
 public class LogoutMessage implements Message{
     private short opcode = 3;
@@ -19,7 +20,7 @@ public class LogoutMessage implements Message{
     }
 
     @Override
-    public void act(BidiMessagingProtocol myProtocol) {
-
+    public void act(BidiMessagingProtocolImp myProtocol) {
+        myProtocol.logout(opcode);
     }
 }

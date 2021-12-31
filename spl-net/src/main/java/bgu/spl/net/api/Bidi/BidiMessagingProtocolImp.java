@@ -55,6 +55,7 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         boolean work = this.dataBase.logOutRe(this.userName);
         if (work){
             ans = new Ack(opcode);
+            userName = "";
         }
         else{
             ans = new ErrorMessage(opcode);
@@ -63,7 +64,7 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         this.connections.send(this.myId, ans);
     }
 
-    public void LogStat(short opcode){
+    public void logStat(short opcode){
         while (!dataBase.connectedUsers().isEmpty()) { //if users getting loged all the time we will not get out of this loop!
             User user = dataBase.connectedUsers().poll();
             Message userDataAck = new AckUserInfo(user.getAge(), user.getNumOfFollowers(),user.getNumOfFollowing());
@@ -72,10 +73,9 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
     }
 
     public void post(short opcode, String content){
-
         if (dataBase.isRegister(userName) && dataBase.isLogged(userName)){
             User user = dataBase.getUser(userName);
-            user.addPost(content);
+            dataBase.addPost(userName,content);
             Message post = new NotificationMessage((byte)(1), userName, content);
 
             //sending to followers
@@ -130,46 +130,38 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         }
         return name;
     }
-    public void logIn(String userName,String password){
+    public void logIn(short opcode,String userName,String password){
         boolean work = true;
-        Integer opcode = new Integer(2);
         work = dataBase.logInRe(userName,password);
         if(work)
-            connections.send(myId,new Ack(opcode.shortValue()));
+            connections.send(myId,new Ack(opcode);
         else
-            connections.send(myId,new Error());
+            connections.send(myId,new ErrorMessage(opcode));
     }
 
-    @Override
-    public void follow(byte follow, String userName) {
+    public void follow(short opcode, byte follow, String userName) {
         boolean work = true;
-        Integer opcode = new Integer(4);
         work = dataBase.follow(follow,this.userName,userName);
         if(work)
-            connections.send(myId,new ACKFollow(opcode.shortValue(),userName));
+            connections.send(myId,new ACKFollow(opcode,userName));
         else
-            connections.send(myId,new Error());
+            connections.send(myId,new ErrorMessage(opcode));
     }
 
-    @Override
     public void PM() {
         boolean work = true;
     }
 
-    @Override
     public void stat() {
 
     }
 
-    @Override
     public void block() {
 
     }
 
 
 
-
-    @Override
     public boolean shouldTerminate() {
         return this.shouldTerminate;
     }

@@ -1,5 +1,6 @@
 package bgu.spl.net.api.Bidi.Messages;
 import bgu.spl.net.api.Bidi.BidiMessagingProtocol;
+import bgu.spl.net.api.Bidi.BidiMessagingProtocolImp;
 import bgu.spl.net.impl.rci.Command;
 import bgu.spl.net.Datas.DataBase;
 import java.util.List;
@@ -11,7 +12,7 @@ public interface Message{
 
     byte[] serialize();
 
-    void act(BidiMessagingProtocol myProtocol);
+    void act(BidiMessagingProtocolImp myProtocol);
 
 
 }

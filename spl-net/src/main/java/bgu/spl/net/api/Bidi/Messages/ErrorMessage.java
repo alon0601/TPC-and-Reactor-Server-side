@@ -1,6 +1,7 @@
 package bgu.spl.net.api.Bidi.Messages;
 
 import bgu.spl.net.api.Bidi.BidiMessagingProtocol;
+import bgu.spl.net.api.Bidi.BidiMessagingProtocolImp;
 
 public class ErrorMessage implements Message{
     private short opcode = 11;
@@ -26,7 +27,7 @@ public class ErrorMessage implements Message{
     }
 
     @Override
-    public void act(BidiMessagingProtocol myProtocol) {
+    public void act(BidiMessagingProtocolImp myProtocol) {
 
     }
 }
