@@ -17,13 +17,13 @@ public class User {
 //    private Queue<String> outMsg;
     private Queue<String> PMMsg;
     private Queue<String> posts;
+    private Queue<Message> waitingMessages;
+    private int connectionId;
 
     public Queue<Message> getWaitingMessages() {
         return waitingMessages;
     }
 
-    private Queue<Message> waitingMessages;
-    private int connectionId;
 
     public User(String userName, String password, String birthDay){
         this.userName = userName;

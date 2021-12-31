@@ -170,7 +170,7 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
             this.connections.send(myId,new ErrorMessage(opcode));
     }
 
-    public String filter(String content){
+    private String filter(String content){
         List<String> filtered = this.dataBase.getFilteredWords();
         String ans = content;
         for(String word:filtered){

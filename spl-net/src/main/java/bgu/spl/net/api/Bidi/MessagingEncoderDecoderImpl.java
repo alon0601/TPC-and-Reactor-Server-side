@@ -37,11 +37,11 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
         bytes[len++] = nextByte;
     }
 
-    private List<String> makeArgs(){
+    private List<String> makeArgs(){ //create args out of bytes
         List<String> args = new LinkedList<>();
         int idx = 2;
         int i = 0;
-        while (i != -1 || idx < len || i < len){
+        while (i != -1 && idx < len && i < len){
             i = findNextZero(idx);
             args.add(new String(bytes, idx, i, StandardCharsets.UTF_8));
             idx = i + 1;
@@ -84,7 +84,7 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
             List<String> listUsers = new LinkedList<>();
             String users = args.get(0);
             String userName = "";
-            for (int i = 0; i < users.length(); i++){
+            for (int i = 0; i < users.length(); i++){ //make list of userNames for StatsRequestMessage
                 if (users.indexOf(i) == '|'){
                     listUsers.add(userName);
                     userName = "";
@@ -101,7 +101,7 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
         return message;
     }
 
-    private int findNextZero(int idx){
+    private int findNextZero(int idx){ //find the next zero from the idx index
         int i = idx;
         while (i < len){
             if (bytes[i] == '\0'){
