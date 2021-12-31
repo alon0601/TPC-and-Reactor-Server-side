@@ -7,11 +7,15 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class DataBase {
     private Map<String,User> users;
-    private Queue<String> loggedInUsers;
+    private Queue<User> loggedInUsers;
 
     public DataBase(){
         users = new ConcurrentHashMap<>();
         loggedInUsers = new ConcurrentLinkedQueue<>();
+    }
+
+    public User getUser(String userName){
+        return users.get(userName);
     }
 
     public boolean register(String userName,String password,String birthday){
@@ -27,7 +31,7 @@ public class DataBase {
         if(user == null || user.getLog())
             return false;
         user.logIn();
-        loggedInUsers.add(userName);
+        loggedInUsers.add(user);
         return true;
     }
 
@@ -60,6 +64,9 @@ public class DataBase {
         return true;
     }
 
+    public boolean isRegister(String userName){
+        return (this.users.get(userName) != null);
+    }
     public boolean isLogged(String username){
         return this.users.get(username).getLog();
     }
@@ -80,7 +87,7 @@ public class DataBase {
         return true;
     }
 
-    public Queue<String> connectedUsers(){
+    public Queue<User> connectedUsers(){
         return loggedInUsers;
     }
 

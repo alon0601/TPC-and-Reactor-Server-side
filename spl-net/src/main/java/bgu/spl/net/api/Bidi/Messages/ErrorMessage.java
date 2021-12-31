@@ -2,11 +2,11 @@ package bgu.spl.net.api.Bidi.Messages;
 
 import bgu.spl.net.api.Bidi.BidiMessagingProtocol;
 
-public class errorMessage implements Message{
+public class ErrorMessage implements Message{
     private short opcode = 11;
     private short msgOpcode;
 
-    errorMessage(short _msgOpcode){
+    public ErrorMessage(short _msgOpcode){
         this.msgOpcode = _msgOpcode;
     }
 
