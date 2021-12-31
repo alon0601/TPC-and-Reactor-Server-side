@@ -134,7 +134,7 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         boolean work = true;
         work = dataBase.logInRe(userName,password);
         if(work)
-            connections.send(myId,new Ack(opcode);
+            connections.send(myId,new Ack(opcode));
         else
             connections.send(myId,new ErrorMessage(opcode));
     }
