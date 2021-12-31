@@ -17,11 +17,27 @@ public class Ack implements Message{
 
     @Override
     public byte[] serialize() {
-        return new byte[0];
+        byte[] bytes = new byte[4];
+        bytes[0] = (byte)((opcode >> 8) & 0xFF);
+        bytes[1] = (byte)(opcode & 0xFF);
+        bytes[2] = (byte)((otherOpcode >> 8) & 0xFF);
+        bytes[3] = (byte)(otherOpcode & 0xFF);
+        return bytes;
     }
 
     @Override
     public void act(BidiMessagingProtocol myProtocol) {
 
+    }
+
+    protected byte[] allBytes(byte[] b1, byte[] b2){ //adding 2 different byte[] to a single byte[]
+        byte[] allBytes = new byte[b1.length + b2.length];
+        for (int i = 0; i < b1.length; i++){
+            allBytes[i] = b1[i];
+        }
+        for (int i = 0; i < b2.length; i++){
+            allBytes[i + b1.length] = b2[i];
+        }
+        return allBytes;
     }
 }

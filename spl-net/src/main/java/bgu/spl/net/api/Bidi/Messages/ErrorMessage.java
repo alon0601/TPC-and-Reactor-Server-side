@@ -17,7 +17,12 @@ public class ErrorMessage implements Message{
 
     @Override
     public byte[] serialize() {
-        return new byte[0];
+        byte[] bytes = new byte[4];
+        bytes[0] = (byte)((opcode >> 8) & 0xFF);
+        bytes[1] = (byte)(opcode & 0xFF);
+        bytes[2] = (byte)((msgOpcode >> 8) & 0xFF);
+        bytes[3] = (byte)(msgOpcode & 0xFF);
+        return bytes;
     }
 
     @Override

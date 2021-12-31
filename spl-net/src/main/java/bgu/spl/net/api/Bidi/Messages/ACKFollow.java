@@ -8,4 +8,11 @@ public class ACKFollow extends Ack{
         super(otherOpcode);
         this.username = username;
     }
+
+    @Override
+    public byte[] serialize() {
+        byte[] bytes = super.serialize();
+        byte[] userNameBytes = this.username.getBytes();
+        return this.allBytes(bytes, userNameBytes);
+    }
 }
