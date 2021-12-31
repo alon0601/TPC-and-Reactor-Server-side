@@ -110,4 +110,20 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
         }
         return -1;
     }
+
+    public static void main(String[] args) {
+        MessagingEncoderDecoderImpl m = new MessagingEncoderDecoderImpl();
+        Integer age = 3;
+        Integer numOfPosts = 5;
+        Integer numFollowing = 7;
+        Integer numFollowers = 1;
+        Message msg = new AckUserInfo(age.shortValue(),numFollowing.shortValue(),numFollowers.shortValue());
+        byte[] ans = m.encode(msg);
+        String ans1 ="";
+        for(Byte b:ans) {
+            System.out.print(b);
+            ans1 = (String) m.decodeNextByte(b);
+        }
+        System.out.println(ans1);
+    }
 }

@@ -55,12 +55,14 @@ public class DataBase {
                 return false;
             }
             meUser.addFollowing(userOther);
+            userOther.addFollower(meUser);
         }
         else{
             if(!meUser.isFollowing(userOther)){
                 return false;
             }
             meUser.removeFollowing(userOther);
+            userOther.removeFollower(meUser);
         }
         return true;
     }
@@ -80,8 +82,19 @@ public class DataBase {
         return true;
     }
 
-    public boolean addPM(String sendName,String reciveName,String content){
-        User user = this.users.get(reciveName);
+    public boolean block(String userName,String blockedUser){
+        User user = this.users.get(userName);
+        User blockUser = this.users.get(blockedUser);
+        if(user == null || blockUser == null)
+            return false;
+        user.addBlock(blockUser);
+        user.block(blockUser);
+        blockUser.block(user);
+        return true;
+    }
+
+    public boolean addPM(String sendName, String receiveName, String content){
+        User user = this.users.get(receiveName);
         User send = this.users.get(sendName);
         if(user == null || send == null || send.isFollowing(user))
             return false;

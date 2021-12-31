@@ -26,14 +26,14 @@ public class AckUserInfo extends Ack{
         //there must be a better way to do it
         byte[] bytes = super.serialize();
         byte[] dataBytes = new byte[8];
-        bytes[0] = (byte)((age >> 8) & 0xFF);
-        bytes[1] = (byte)(age & 0xFF);
-        bytes[2] = (byte)((numPosts >> 8) & 0xFF);
-        bytes[3] = (byte)(numPosts & 0xFF);
-        bytes[4] = (byte)((numFollowers >> 8) & 0xFF);
-        bytes[5] = (byte)(numFollowers & 0xFF);
-        bytes[6] = (byte)((numFollowing >> 8) & 0xFF);
-        bytes[7] = (byte)(numFollowing & 0xFF);
+        dataBytes[0] = (byte)((age >> 8) & 0xFF);
+        dataBytes[1] = (byte)(age & 0xFF);
+        dataBytes[2] = (byte)((numPosts >> 8) & 0xFF);
+        dataBytes[3] = (byte)(numPosts & 0xFF);
+        dataBytes[4] = (byte)((numFollowers >> 8) & 0xFF);
+        dataBytes[5] = (byte)(numFollowers & 0xFF);
+        dataBytes[6] = (byte)((numFollowing >> 8) & 0xFF);
+        dataBytes[7] = (byte)(numFollowing & 0xFF);
         return this.allBytes(bytes, dataBytes);
     }
 
