@@ -130,15 +130,6 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         }
         return name;
     }
-
-
-
-
-    @Override
-    public boolean shouldTerminate() {
-        return this.shouldTerminate;
-    }
-
     public void logIn(String userName,String password){
         boolean work = true;
         Integer opcode = new Integer(2);
@@ -152,17 +143,17 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
     @Override
     public void follow(byte follow, String userName) {
         boolean work = true;
-        Integer opcode = new Integer(2);
-        work = dataBase.follow(follow,userName,"11");
+        Integer opcode = new Integer(4);
+        work = dataBase.follow(follow,this.userName,userName);
         if(work)
-            connections.send(myId,new Ack(opcode.shortValue()));
+            connections.send(myId,new ACKFollow(opcode.shortValue(),userName));
         else
             connections.send(myId,new Error());
     }
 
     @Override
     public void PM() {
-
+        boolean work = true;
     }
 
     @Override
@@ -174,5 +165,14 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
     public void block() {
 
     }
+
+
+
+
+    @Override
+    public boolean shouldTerminate() {
+        return this.shouldTerminate;
+    }
+
 
 }
