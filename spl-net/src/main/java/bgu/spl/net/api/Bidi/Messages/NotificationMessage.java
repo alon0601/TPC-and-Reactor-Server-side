@@ -8,7 +8,7 @@ public class NotificationMessage implements Message{
     private String postingUser;
     private String content;
 
-    NotificationMessage(byte _type,String _postingUser,String _content){
+    public NotificationMessage(byte _type,String _postingUser,String _content){
         this.type = _type;
         this.postingUser = _postingUser;
         this.content = _content;

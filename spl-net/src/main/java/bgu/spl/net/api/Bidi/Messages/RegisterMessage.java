@@ -8,7 +8,7 @@ public class RegisterMessage implements Message {
     private String username;
     private String password;
 
-    RegisterMessage(String _userName, String _password, String _bday){
+    public RegisterMessage(String _userName, String _password, String _bday){
         this.username = _userName;
         this.password = _password;
     }

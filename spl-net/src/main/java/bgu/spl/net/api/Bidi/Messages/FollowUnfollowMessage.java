@@ -25,6 +25,6 @@ public class FollowUnfollowMessage implements Message{
 
     @Override
     public void act(BidiMessagingProtocol myProtocol) {
-
+        myProtocol.follow(follow,userName);
     }
 }

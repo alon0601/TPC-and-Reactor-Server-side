@@ -6,7 +6,7 @@ public class PostMessages implements Message{
     private short opcode = 5;
     private String content;
 
-    PostMessages(String _content){
+    public PostMessages(String _content){
         this.content = _content;
     }
 

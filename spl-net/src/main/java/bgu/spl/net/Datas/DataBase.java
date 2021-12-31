@@ -40,12 +40,12 @@ public class DataBase {
         return true;
     }
 
-    public boolean follow(boolean follow,String userMe,String otherUser){
+    public boolean follow(byte follow,String userMe,String otherUser){
         User meUser = users.get(userMe);
         User userOther = users.get(otherUser);
         if(meUser == null || userOther == null || !meUser.getLog())
             return false;
-        if(follow){
+        if(follow == 1){
             if(meUser.isFollowing(userOther)){
                 return false;
             }

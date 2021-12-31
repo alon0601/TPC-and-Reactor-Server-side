@@ -5,7 +5,7 @@ import bgu.spl.net.api.Bidi.BidiMessagingProtocol;
 public class LogstatMessage implements Message{
     private short opcode = 7;
 
-    LogstatMessage(){
+    public LogstatMessage(){
     }
 
     @Override
