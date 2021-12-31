@@ -1,7 +1,8 @@
 package bgu.spl.net.Datas;
 
-import bgu.spl.net.Messages.Message;
+import bgu.spl.net.api.Bidi.Messages.Message;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -17,6 +18,7 @@ public class User {
     private Queue<String> PMMsg;
     private Queue<String> posts;
     private Queue<Message> waitingMessages;
+    private int connectionId;
 
     public User(String userName, String password, String birthDay){
         this.userName = userName;
@@ -86,6 +88,10 @@ public class User {
         return this.loggedIn;
     }
 
+    public int getConnectionId(){
+        return this.connectionId;
+    }
+
     public void addFollower(User follower){
         this.followers.add(follower);
     }
@@ -113,4 +119,27 @@ public class User {
     public boolean isFollowing(User user){return this.following.contains(user);}
 
     public boolean isFollowed(User user){return this.followers.contains(user);}
+
+    public short getAge(){
+        Calendar bday = Calendar.getInstance();
+        Calendar now = Calendar.getInstance();
+
+        bday.set(Integer.parseInt(this.birthDay.substring(0,2)), Integer.parseInt(this.birthDay.substring(3,5)), Integer.parseInt(this.birthDay.substring(6))); //very bad way
+
+        int age = now.get(Calendar.YEAR) - bday.get(Calendar.YEAR);
+
+        if (now.get(Calendar.DAY_OF_YEAR) < bday.get(Calendar.DAY_OF_YEAR)){
+            age--;
+        }
+
+        return (short)age;
+    }
+
+    public short getNumOfFollowers(){
+        return (short)(this.followers.size());
+    }
+
+    public short getNumOfFollowing(){
+        return (short)this.following.size();
+    }
 }
