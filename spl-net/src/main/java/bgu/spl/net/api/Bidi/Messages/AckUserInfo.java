@@ -1,6 +1,6 @@
 package bgu.spl.net.api.Bidi.Messages;
 
-import bgu.spl.net.api.Bidi.BidiMessagingProtocol;
+import bgu.spl.net.api.Bidi.BidiMessagingProtocolImp;
 
 public class AckUserInfo extends Ack{
 
@@ -38,7 +38,7 @@ public class AckUserInfo extends Ack{
     }
 
     @Override
-    public void act(BidiMessagingProtocol myProtocol) {
+    public void act(BidiMessagingProtocolImp myProtocol) {
 
     }
 }

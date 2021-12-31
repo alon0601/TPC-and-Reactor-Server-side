@@ -5,12 +5,8 @@ import bgu.spl.net.Datas.User;
 import bgu.spl.net.api.Bidi.BidiMessagingProtocol;
 import bgu.spl.net.api.Bidi.Connections;
 import bgu.spl.net.api.Bidi.Messages.*;
-import sun.jvm.hotspot.types.JByteField;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
@@ -130,20 +126,26 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         }
         return name;
     }
+
     public void logIn(String userName,String password){
+        this.userName = userName;
         boolean work = true;
-        Integer opcode = new Integer(2);
+        Integer opcode = 2;
         work = dataBase.logInRe(userName,password);
-        if(work)
-            connections.send(myId,new Ack(opcode.shortValue()));
+        if(work) {
+            connections.send(myId, new Ack(opcode.shortValue()));
+            User user =this.dataBase.getUser(this.userName);
+            for(Message msg:user.getWaitingMessages()){
+                connections.send(myId, new Ack(msg.getOpcode()));
+            }
+        }
         else
             connections.send(myId,new Error());
     }
 
-    @Override
     public void follow(byte follow, String userName) {
         boolean work = true;
-        Integer opcode = new Integer(4);
+        Integer opcode = 4;
         work = dataBase.follow(follow,this.userName,userName);
         if(work)
             connections.send(myId,new ACKFollow(opcode.shortValue(),userName));
@@ -151,22 +153,40 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
             connections.send(myId,new Error());
     }
 
-    @Override
-    public void PM() {
+    public void PM(short opcode,String userName,String content) {
         boolean work = true;
+        String newContent = filter(content);
+        work = dataBase.addPM(this.userName,userName,content);
+        //sending to otherUser
+        if(work) {
+            Message PM = new NotificationMessage((byte) (0), userName, newContent);
+            User user = this.dataBase.getUser(userName);
+            if(user.getLog())
+                connections.send(myId,PM);
+            else
+                user.addWaitingMsg(PM);
+
+        }
+        else
+            this.connections.send(myId,new ErrorMessage(opcode));
     }
 
-    @Override
+    public String filter(String content){
+        List<String> filtered = this.dataBase.getFilteredWords();
+        String ans = content;
+        for(String word:filtered){
+            ans = ans.replace(word,"<filtered>");
+        }
+        return ans;
+    }
+
     public void stat() {
 
     }
 
-    @Override
     public void block() {
 
     }
-
-
 
 
     @Override
@@ -175,4 +195,12 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
     }
 
 
+    public static void main(String[] args) {
+        DataBase data = new DataBase();
+        data.addFilteredWords("abc");
+        String ans = "abc kk abc lmno";
+        BidiMessagingProtocolImp bidiMessagingProtocol = new BidiMessagingProtocolImp(data);
+        ans = bidiMessagingProtocol.filter(ans);
+        System.out.println(ans);
+    }
 }

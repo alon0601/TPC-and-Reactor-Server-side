@@ -1,6 +1,6 @@
 package bgu.spl.net.api.Bidi.Messages;
 
-import bgu.spl.net.api.Bidi.BidiMessagingProtocol;
+import bgu.spl.net.api.Bidi.BidiMessagingProtocolImp;
 
 public class RegisterMessage implements Message {
 
@@ -24,7 +24,7 @@ public class RegisterMessage implements Message {
     }
 
     @Override
-    public void act(BidiMessagingProtocol bidiMessagingProtocol) {
+    public void act(BidiMessagingProtocolImp bidiMessagingProtocol) {
     }
 
 }

@@ -1,17 +1,18 @@
 package bgu.spl.net.Datas;
 
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class DataBase {
     private Map<String,User> users;
     private Queue<User> loggedInUsers;
+    private List<String> filteredWords;
 
     public DataBase(){
         users = new ConcurrentHashMap<>();
         loggedInUsers = new ConcurrentLinkedQueue<>();
+        filteredWords = new LinkedList<>();
     }
 
     public User getUser(String userName){
@@ -79,9 +80,10 @@ public class DataBase {
         return true;
     }
 
-    public boolean addPM(String userName,String content){
-        User user = this.users.get(userName);
-        if(user == null)
+    public boolean addPM(String sendName,String reciveName,String content){
+        User user = this.users.get(reciveName);
+        User send = this.users.get(sendName);
+        if(user == null || send == null || send.isFollowing(user))
             return false;
         user.addPMMsg(content);
         return true;
@@ -91,4 +93,11 @@ public class DataBase {
         return loggedInUsers;
     }
 
+    public List<String> getFilteredWords(){
+        return this.filteredWords;
+    }
+
+    public void addFilteredWords(String filter){
+        this.filteredWords.add(filter);
+    }
 }
