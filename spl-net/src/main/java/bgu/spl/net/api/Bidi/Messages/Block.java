@@ -1,5 +1,6 @@
 package bgu.spl.net.api.Bidi.Messages;
 
+import bgu.spl.net.api.Bidi.BidiMessagingProtocol;
 import bgu.spl.net.api.Bidi.BidiMessagingProtocolImp;
 
 public class Block implements Message{

@@ -1,5 +1,6 @@
 package bgu.spl.net.api.Bidi.Messages;
 
+import bgu.spl.net.api.Bidi.BidiMessagingProtocol;
 import bgu.spl.net.api.Bidi.BidiMessagingProtocolImp;
 
 public class LogstatMessage implements Message{
@@ -20,6 +21,7 @@ public class LogstatMessage implements Message{
 
     @Override
     public void act(BidiMessagingProtocolImp myProtocol) {
-
+        myProtocol.logStat(opcode);
     }
+
 }

@@ -1,6 +1,9 @@
 package bgu.spl.net.api.Bidi.Messages;
 
+import bgu.spl.net.api.Bidi.BidiMessagingProtocol;
 import bgu.spl.net.api.Bidi.BidiMessagingProtocolImp;
+
+import java.sql.Time;
 
 public class PmMessage implements Message{
 
@@ -26,6 +29,6 @@ public class PmMessage implements Message{
 
     @Override
     public void act(BidiMessagingProtocolImp myProtocol) {
-        myProtocol.PM(this.opcode,this.userName,this.content);
+        myProtocol.PM();
     }
 }

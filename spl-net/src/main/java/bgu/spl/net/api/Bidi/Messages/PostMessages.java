@@ -1,5 +1,6 @@
 package bgu.spl.net.api.Bidi.Messages;
 
+import bgu.spl.net.api.Bidi.BidiMessagingProtocol;
 import bgu.spl.net.api.Bidi.BidiMessagingProtocolImp;
 
 public class PostMessages implements Message{
@@ -22,6 +23,6 @@ public class PostMessages implements Message{
 
     @Override
     public void act(BidiMessagingProtocolImp myProtocol) {
-
+        myProtocol.post(opcode, content);
     }
 }

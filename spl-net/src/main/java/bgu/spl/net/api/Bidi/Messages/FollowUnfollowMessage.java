@@ -1,5 +1,6 @@
 package bgu.spl.net.api.Bidi.Messages;
 
+import bgu.spl.net.api.Bidi.BidiMessagingProtocol;
 import bgu.spl.net.api.Bidi.BidiMessagingProtocolImp;
 
 public class FollowUnfollowMessage implements Message{
@@ -24,6 +25,6 @@ public class FollowUnfollowMessage implements Message{
 
     @Override
     public void act(BidiMessagingProtocolImp myProtocol) {
-        myProtocol.follow(follow,userName);
+        myProtocol.follow(opcode, follow,userName);
     }
 }

@@ -1,6 +1,7 @@
 package bgu.spl.net.api.Bidi.Messages;
 
 
+import bgu.spl.net.api.Bidi.BidiMessagingProtocol;
 import bgu.spl.net.api.Bidi.BidiMessagingProtocolImp;
 
 public class LoginMessages implements Message{
@@ -28,6 +29,6 @@ public class LoginMessages implements Message{
 
     @Override
     public void act(BidiMessagingProtocolImp myProtocol) {
-        myProtocol.logIn(userName,password);
+        myProtocol.logIn(opcode, userName,password);
     }
 }
