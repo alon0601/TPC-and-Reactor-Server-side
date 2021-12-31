@@ -8,10 +8,12 @@ public class LoginMessages implements Message{
     private short opcode = 2;
     private String userName;
     private String password;
+    private byte capcha;
 
-    public LoginMessages(String userName, String password){
+    public LoginMessages(String userName, String password, byte capcha){
         this.userName = userName;
         this.password = password;
+        this.capcha = capcha;
     }
 
     @Override
