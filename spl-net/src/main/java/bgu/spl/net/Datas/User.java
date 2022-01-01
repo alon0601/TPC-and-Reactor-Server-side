@@ -12,6 +12,7 @@ public class User {
     private String password;
     private String birthDay;
     private boolean loggedIn = false;
+    private Queue<User> blocking;
     private Queue<User> following;
     private Queue<User> followers;
 //    private Queue<String> outMsg;
@@ -20,9 +21,7 @@ public class User {
     private Queue<Message> waitingMessages;
     private int connectionId;
 
-    public Queue<Message> getWaitingMessages() {
-        return waitingMessages;
-    }
+
 
 
     public User(String userName, String password, String birthDay){
@@ -36,7 +35,9 @@ public class User {
         this.followers = new ConcurrentLinkedQueue<>();
         this.waitingMessages = new ConcurrentLinkedQueue<>();
     }
-
+    public Queue<Message> getWaitingMessages() {
+        return waitingMessages;
+    }
     public String getUserName() {
         return userName;
     }
@@ -49,9 +50,6 @@ public class User {
         return birthDay;
     }
 
-//    public Queue<String> getOutMsg() {
-//        return outMsg;
-//    }
 
     public Queue<String> getPosts() {
         return posts;
@@ -65,9 +63,18 @@ public class User {
         this.posts.add(post);
     }
 
-//    public void addOutMsg(String outMsg){
-//        this.outMsg.add(outMsg);
-//    }
+    public void addBlock(User blocked){
+        this.blocking.add(blocked);
+    }
+
+    public boolean isBlocked(User block){
+        return this.blocking.contains(block);
+    }
+
+    public void block(User block){
+        this.removeFollowing(block);
+        this.removeFollower(block);
+    }
 
     public void addPMMsg(String inMsg){
         this.PMMsg.add(inMsg);

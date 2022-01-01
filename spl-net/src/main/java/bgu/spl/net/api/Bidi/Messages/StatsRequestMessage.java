@@ -26,6 +26,6 @@ public class StatsRequestMessage implements Message{
 
     @Override
     public void act(BidiMessagingProtocolImp myProtocol) {
-        myProtocol.stat();
+        myProtocol.stat(this.opcode,this.userNames);
     }
 }

@@ -23,6 +23,6 @@ public class Block implements Message{
 
     @Override
     public void act(BidiMessagingProtocolImp myProtocol) {
-
+        myProtocol.block(this.opcode,this.userName);
     }
 }

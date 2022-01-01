@@ -1,9 +1,11 @@
 package bgu.spl.net.api.Bidi;
+
 import bgu.spl.net.Datas.DataBase;
 import bgu.spl.net.Datas.User;
 import bgu.spl.net.api.Bidi.BidiMessagingProtocol;
 import bgu.spl.net.api.Bidi.Connections;
 import bgu.spl.net.api.Bidi.Messages.*;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -133,7 +135,7 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
             connections.send(myId, new Ack(opcode));
             User user =this.dataBase.getUser(this.userName);
             for(Message msg:user.getWaitingMessages()){
-                connections.send(myId, new Ack(msg.getOpcode()));
+                connections.send(myId, msg);
             }
         }
         else
@@ -176,12 +178,27 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         return ans;
     }
 
-    public void stat() {
-
+    public void stat(short opcode,List<String> usernames) {
+        if(dataBase.getUser(this.userName) == null)
+            connections.send(myId,new ErrorMessage(opcode));
+        else {
+            while (!usernames.isEmpty()) {
+                User user = dataBase.connectedUsers().poll();
+                Message userDataAck = new AckUserInfo(user.getAge(), user.getNumOfFollowers(), user.getNumOfFollowing());
+                connections.send(this.myId, userDataAck);
+            }
+        }
     }
 
-    public void block() {
-
+    public void block(short opcode,String blocked) {
+        boolean work = this.dataBase.block(this.userName,blocked);
+        User user = this.dataBase.getUser(this.userName);
+        User block = this.dataBase.getUser(blocked);
+        if(work){
+            connections.send(this.myId,new Ack(opcode));
+        }
+        else
+            connections.send(this.myId,new ErrorMessage(opcode));
     }
 
 
