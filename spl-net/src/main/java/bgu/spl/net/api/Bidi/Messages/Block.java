@@ -5,7 +5,7 @@ import bgu.spl.net.api.Bidi.BidiMessagingProtocolImp;
 
 public class Block implements Message{
 
-    private short opcode = 12;
+    private short opcode = (short)12;
     private String userName;
 
     public Block(String userName){

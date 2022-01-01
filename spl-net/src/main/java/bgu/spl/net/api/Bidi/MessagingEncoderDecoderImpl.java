@@ -61,29 +61,37 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
         if(opcode == 1){
             message = new RegisterMessage(args.get(0),args.get(1),args.get(2));
         }
+
         if (opcode == 2){
             message = new LoginMessages(args.get(0),args.get(1),bytes[len-1]);
         }
+
         if (opcode == 3){
             message = new LogoutMessage();
         }
+
         if (opcode == 4){
             String userName = new String(bytes, 3, len, StandardCharsets.UTF_8);
             message = new FollowUnfollowMessage(bytes[2],userName);
         }
+
         if (opcode == 5){
             message = new PostMessages(args.get(0));
         }
+
         if (opcode == 6){
             message = new PmMessage(args.get(0), args.get(1), args.get(2));
         }
+
         if (opcode == 7){
             message = new LogstatMessage();
         }
+
         if (opcode == 8){
             List<String> listUsers = new LinkedList<>();
             String users = args.get(0);
             String userName = "";
+
             for (int i = 0; i < users.length(); i++){ //make list of userNames for StatsRequestMessage
                 if (users.indexOf(i) == '|'){
                     listUsers.add(userName);
@@ -94,6 +102,7 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
                     userName = userName + users.indexOf(i);
                 }
             }
+
             message = new StatsRequestMessage(listUsers);
         }
 

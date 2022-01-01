@@ -4,7 +4,7 @@ import bgu.spl.net.api.Bidi.BidiMessagingProtocolImp;
 
 public class Ack implements Message{
 
-    short opcode = 10;
+    short opcode = (short)10;
     short otherOpcode;
 
     public Ack(short otherOpcode){
