@@ -5,9 +5,11 @@ import bgu.spl.net.srv.ConnectionHandler;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConnectionsImp implements Connections {
     Map<Integer,ConnectionHandler> connectionMap;
+
 
     public ConnectionsImp(){
         this.connectionMap = new ConcurrentHashMap<>();
@@ -32,4 +34,9 @@ public class ConnectionsImp implements Connections {
     public void disconnect(int connId) {
         this.connectionMap.remove(connId);
     }
+
+    public synchronized void connect(int id, ConnectionHandler con){
+        this.connectionMap.put(id,con);
+    }
+
 }

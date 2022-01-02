@@ -1,6 +1,7 @@
 package bgu.spl.net.srv;
 
 import bgu.spl.net.api.Bidi.BidiMessagingProtocol;
+import bgu.spl.net.api.Bidi.Connections;
 import bgu.spl.net.api.Bidi.Messages.Message;
 import bgu.spl.net.api.MessageEncoderDecoder;
 
@@ -17,15 +18,19 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
     private BufferedInputStream in;
     private BufferedOutputStream out;
     private volatile boolean connected = true;
-
-    public BlockingConnectionHandler(Socket sock, MessageEncoderDecoder<T> reader, BidiMessagingProtocol<T> protocol) {
+    private Connections myCon;
+    private int conId;
+    public BlockingConnectionHandler(Socket sock, MessageEncoderDecoder<T> reader, BidiMessagingProtocol<T> protocol, Connections con, int conId) {
         this.sock = sock;
         this.encdec = reader;
         this.protocol = protocol;
+        this.myCon = con;
+        this.conId = conId;
     }
 
     @Override
     public void run() {
+        this.protocol.start(conId,myCon);
         try (Socket sock = this.sock) { //just for automatic closing
             int read;
 

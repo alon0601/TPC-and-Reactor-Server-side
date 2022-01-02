@@ -4,6 +4,8 @@ import bgu.spl.net.api.Bidi.Messages.*;
 import bgu.spl.net.api.MessageEncoderDecoder;
 
 import java.nio.charset.StandardCharsets;
+import java.sql.Time;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,12 +13,12 @@ import java.util.List;
 public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
 
     private int len = 0;
-    private byte[] bytes = new byte[1 << 10];;
+    private byte[] bytes = new byte[1 << 10];
 
     public MessagingEncoderDecoderImpl(){}
     @Override
     public Object decodeNextByte(byte nextByte) {
-        if (nextByte == '\n') {
+        if (nextByte == ';') {
             return popMessage();
         }
 
@@ -80,7 +82,7 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
         }
 
         if (opcode == 6){
-            message = new PmMessage(args.get(0), args.get(1), args.get(2));
+            message = new PmMessage(args.get(0), args.get(1), LocalDate.now().toString());
         }
 
         if (opcode == 7){

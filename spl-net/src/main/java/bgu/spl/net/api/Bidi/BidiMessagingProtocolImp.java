@@ -134,6 +134,7 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         if(work) {
             connections.send(myId, new Ack(opcode));
             User user =this.dataBase.getUser(this.userName);
+            user.setConnectionId(this.myId);
             for(Message msg:user.getWaitingMessages()){
                 connections.send(myId, msg);
             }
