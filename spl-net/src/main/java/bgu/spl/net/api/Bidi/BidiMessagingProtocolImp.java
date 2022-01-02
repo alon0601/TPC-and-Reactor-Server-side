@@ -63,7 +63,7 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
     public void logStat(short opcode){
         while (!dataBase.connectedUsers().isEmpty()) { //if users getting loged all the time we will not get out of this loop!
             User user = dataBase.connectedUsers().poll();
-            Message userDataAck = new AckUserInfo(user.getAge(), user.getNumOfFollowers(),user.getNumOfFollowing());
+            Message userDataAck = new AckUserInfo(opcode,user.getAge(), user.getNumOfFollowers(),user.getNumOfFollowing());
             connections.send(this.myId, userDataAck);
         }
     }
@@ -88,7 +88,7 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
             Queue<String> tagged = tagged(content);
             for (String name : tagged){
                 User tagUser = dataBase.getUser(name);
-                if (tagUser != null && !user.getFollowers().contains(tagUser)){
+                if (tagUser != null && !user.getFollowers().contains(tagUser) && !tagUser.isBlocked(user)){ //check if not null and didnt send already and didnt block me
                     if (tagUser.getLog()){
                         connections.send(tagUser.getConnectionId(),post);
                     }
@@ -137,6 +137,7 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
             for(Message msg:user.getWaitingMessages()){
                 connections.send(myId, msg);
             }
+            user.getWaitingMessages().clear();
         }
         else
             connections.send(myId,new ErrorMessage(opcode));
@@ -184,7 +185,7 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         else {
             while (!usernames.isEmpty()) {
                 User user = dataBase.connectedUsers().poll();
-                Message userDataAck = new AckUserInfo(user.getAge(), user.getNumOfFollowers(), user.getNumOfFollowing());
+                Message userDataAck = new AckUserInfo(opcode,user.getAge(), user.getNumOfFollowers(), user.getNumOfFollowing());
                 connections.send(this.myId, userDataAck);
             }
         }

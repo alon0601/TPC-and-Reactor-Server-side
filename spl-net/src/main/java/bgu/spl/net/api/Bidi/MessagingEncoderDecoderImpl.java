@@ -126,7 +126,7 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
         Integer numOfPosts = 5;
         Integer numFollowing = 7;
         Integer numFollowers = 1;
-        Message msg = new AckUserInfo(age.shortValue(),numFollowing.shortValue(),numFollowers.shortValue());
+        Message msg = new AckUserInfo((short)9 , age.shortValue(),numFollowing.shortValue(),numFollowers.shortValue());
         byte[] ans = m.encode(msg);
         String ans1 ="";
         for(Byte b:ans) {

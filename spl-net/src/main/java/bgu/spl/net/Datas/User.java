@@ -28,7 +28,7 @@ public class User {
         this.userName = userName;
         this.password = password;
         this.birthDay = birthDay;
-//        this.outMsg = new ConcurrentLinkedQueue<String>();
+        this.blocking = new ConcurrentLinkedQueue<>();
         this.PMMsg = new ConcurrentLinkedQueue<>();
         this.posts = new ConcurrentLinkedQueue<>();
         this.following = new ConcurrentLinkedQueue<>();

@@ -9,9 +9,10 @@ public class testing123 {
     public static void main(String[] args) {
         Message ack = new ErrorMessage((short)2);
         byte[] by = ack.serialize();
-        for (byte b: by){
-            System.out.println(b);
-        }
+        short result = (short)((by[0] & 0xff) << 8);
+        result += (short)(by[1] & 0xff);
+        System.out.println(result);
+
     }
 
 }

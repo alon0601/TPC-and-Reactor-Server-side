@@ -51,7 +51,7 @@ public class DataBase {
         if(meUser == null || userOther == null || !meUser.getLog())
             return false;
         if(follow == 1){
-            if(meUser.isFollowing(userOther)){
+            if(meUser.isFollowing(userOther) || meUser.isBlocked(userOther) || userOther.isBlocked(meUser)){ //check if blocked him
                 return false;
             }
             meUser.addFollowing(userOther);
