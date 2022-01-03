@@ -22,8 +22,6 @@ public class User {
     private int connectionId;
 
 
-
-
     public User(String userName, String password, String birthDay){
         this.userName = userName;
         this.password = password;
@@ -153,5 +151,9 @@ public class User {
 
     public short getNumOfFollowing(){
         return (short)this.following.size();
+    }
+
+    public void setConnectionId(int id){
+        this.connectionId = id;
     }
 }
