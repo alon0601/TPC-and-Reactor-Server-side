@@ -17,6 +17,7 @@ public class Ack implements Message{
 
     @Override
     public byte[] serialize() {
+        System.out.println("sending ack");
         byte[] bytes = new byte[4];
         bytes[0] = (byte)((opcode >> 8) & 0xFF);
         bytes[1] = (byte)(opcode & 0xFF);

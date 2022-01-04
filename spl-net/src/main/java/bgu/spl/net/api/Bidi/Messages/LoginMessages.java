@@ -29,6 +29,6 @@ public class LoginMessages implements Message{
 
     @Override
     public void act(BidiMessagingProtocolImp myProtocol) {
-        myProtocol.logIn(opcode, userName,password);
+        myProtocol.logIn(opcode, userName,password ,capcha);
     }
 }

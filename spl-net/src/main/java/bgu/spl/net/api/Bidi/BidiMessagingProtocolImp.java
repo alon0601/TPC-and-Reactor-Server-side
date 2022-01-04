@@ -52,12 +52,16 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         if (work){
             ans = new Ack(opcode);
             userName = "";
+            this.shouldTerminate = true;
         }
         else{
             ans = new ErrorMessage(opcode);
         }
 
         this.connections.send(this.myId, ans);
+
+        if (work)
+            this.connections.disconnect(this.myId);
     }
 
     public void logStat(short opcode){
@@ -127,21 +131,25 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         return name;
     }
 
-    public void logIn(short opcode,String userName,String password){
-        this.userName = userName;
-        boolean work = true;
-        work = dataBase.logInRe(userName,password);
-        if(work) {
-            connections.send(myId, new Ack(opcode));
-            User user =this.dataBase.getUser(this.userName);
-            user.setConnectionId(this.myId);
-            for(Message msg:user.getWaitingMessages()){
-                connections.send(myId, msg);
-            }
-            user.getWaitingMessages().clear();
+    public void logIn(short opcode,String userName,String password, short capcha) {
+        if (capcha - '0' == 1) {
+            this.userName = userName;
+            boolean work = true;
+            work = dataBase.logInRe(userName, password);
+            if (work) {
+                connections.send(myId, new Ack(opcode));
+                User user = this.dataBase.getUser(this.userName);
+                user.setConnectionId(this.myId);
+                for (Message msg : user.getWaitingMessages()) {
+                    connections.send(myId, msg);
+                }
+                user.getWaitingMessages().clear();
+            } else
+                connections.send(myId, new ErrorMessage(opcode));
         }
-        else
-            connections.send(myId,new ErrorMessage(opcode));
+        else{
+            connections.send(myId, new ErrorMessage(opcode));
+        }
     }
 
     public void follow(short opcode, byte follow, String userName) {
@@ -162,7 +170,7 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
             Message PM = new NotificationMessage((byte) (0), userName, newContent);
             User user = this.dataBase.getUser(userName);
             if(user.getLog())
-                connections.send(myId,PM);
+                connections.send(user.getConnectionId(),PM);
             else
                 user.addWaitingMsg(PM);
 
@@ -181,7 +189,7 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
     }
 
     public void stat(short opcode,List<String> usernames) {
-        if(dataBase.getUser(this.userName) == null)
+        if(dataBase.getUser(this.userName) == null || !dataBase.getUser(this.userName).getLog())
             connections.send(myId,new ErrorMessage(opcode));
         else {
             while (!usernames.isEmpty()) {

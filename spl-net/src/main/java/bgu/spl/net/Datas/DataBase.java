@@ -29,7 +29,7 @@ public class DataBase {
 
     public boolean logInRe(String userName,String password){
         User user = users.get(userName);
-        if(user == null || user.getLog())
+        if(user == null || user.getLog() || !user.confirmPassword(password))
             return false;
         user.logIn();
         loggedInUsers.add(user);
@@ -48,9 +48,17 @@ public class DataBase {
     public boolean follow(byte follow,String userMe,String otherUser){
         User meUser = users.get(userMe);
         User userOther = users.get(otherUser);
+
+        //testing
+        if (meUser == null)
+            System.out.println("im null?!");
+        if (userOther == null)
+            System.out.println("other user in null");
+        //end testing
+
         if(meUser == null || userOther == null || !meUser.getLog())
             return false;
-        if(follow == 1){
+        if(follow - '0' == 0){
             if(meUser.isFollowing(userOther) || meUser.isBlocked(userOther) || userOther.isBlocked(meUser)){ //check if blocked him
                 return false;
             }

@@ -12,6 +12,7 @@ import java.util.List;
 
 public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
 
+    private int size = 0;
     private int len = 0;
     private byte[] bytes = new byte[1 << 10];
 
@@ -21,7 +22,7 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
         if (nextByte == ';') {
             return popMessage();
         }
-
+        size++;
         pushByte(nextByte);
         return null; //not a line yet
     }
@@ -43,10 +44,14 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
         List<String> args = new LinkedList<>();
         int idx = 2;
         int i = 0;
-        while (i != -1 && idx < len && i < len){
-            i = findNextZero(idx);
-            args.add(new String(bytes, idx, i, StandardCharsets.UTF_8));
+        i = findNextZero(idx);
+        while (i != -1 && idx <= size && i <= size){
+            args.add(new String(bytes, idx, i - idx , StandardCharsets.UTF_8));
             idx = i + 1;
+            i = findNextZero(idx);
+            System.out.println("i: " + i);
+            System.out.println("idx: " + idx);
+            System.out.println("size: " + size);
         }
         return args;
     }
@@ -58,6 +63,7 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
 
         short opcode = (short)((bytes[0] & 0xff) << 8);
         opcode += (short)(bytes[1] & 0xff);
+        System.out.println("making new message with opCode: " + opcode);
         List<String> args = makeArgs();
 
         if(opcode == 1){
@@ -73,12 +79,14 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
         }
 
         if (opcode == 4){
-            String userName = new String(bytes, 3, len, StandardCharsets.UTF_8);
+            String userName = new String(bytes, 3, size - 4, StandardCharsets.UTF_8);
             message = new FollowUnfollowMessage(bytes[2],userName);
         }
 
         if (opcode == 5){
-            message = new PostMessages(args.get(0));
+            String post = new String(bytes, 2, size - 2, StandardCharsets.UTF_8);
+            System.out.println(post);
+            message = new PostMessages(post);
         }
 
         if (opcode == 6){
@@ -109,15 +117,17 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
         }
 
         len = 0;
+        size = 0;
         return message;
     }
 
     private int findNextZero(int idx){ //find the next zero from the idx index
         int i = idx;
-        while (i < len){
+        while (i <= len){
             if (bytes[i] == '\0'){
                 return i;
             }
+            i++;
         }
         return -1;
     }
