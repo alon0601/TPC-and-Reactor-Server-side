@@ -41,7 +41,7 @@ public class User {
     }
 
     public boolean confirmPassword(String password) {
-        return this.password == password;
+        return this.password.equals(password);
     }
 
     public String getBirthDay() {

@@ -7,13 +7,22 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class DataBase {
     private Map<String,User> users;
     private Queue<User> loggedInUsers;
-    private List<String> filteredWords;
+    private Queue<String> filteredWords;
+    private static DataBase dataBase = null;
 
-    public DataBase(){
+    public static DataBase getInstance() {
+        if(dataBase == null){
+            dataBase = new DataBase();
+        }
+        return dataBase;
+    }
+
+    private DataBase(){
         users = new ConcurrentHashMap<>();
         loggedInUsers = new ConcurrentLinkedQueue<>();
-        filteredWords = new LinkedList<>();
+        filteredWords = new ConcurrentLinkedQueue<>();
     }
+
 
     public User getUser(String userName){
         return users.get(userName);
@@ -29,7 +38,7 @@ public class DataBase {
 
     public boolean logInRe(String userName,String password){
         User user = users.get(userName);
-        if(user == null || user.getLog())
+        if(user == null || user.getLog() || !user.confirmPassword(password))
             return false;
         user.logIn();
         loggedInUsers.add(user);
@@ -41,7 +50,7 @@ public class DataBase {
         if(user == null || !user.getLog())
             return false;
         user.logOut();
-        loggedInUsers.remove(userName);
+        loggedInUsers.remove(user);
         return true;
     }
 
@@ -50,7 +59,7 @@ public class DataBase {
         User userOther = users.get(otherUser);
         if(meUser == null || userOther == null || !meUser.getLog())
             return false;
-        if(follow == 1){
+        if(follow - '0' == 1){
             if(meUser.isFollowing(userOther) || meUser.isBlocked(userOther) || userOther.isBlocked(meUser)){ //check if blocked him
                 return false;
             }
@@ -106,7 +115,7 @@ public class DataBase {
         return loggedInUsers;
     }
 
-    public List<String> getFilteredWords(){
+    public Queue<String> getFilteredWords(){
         return this.filteredWords;
     }
 

@@ -52,6 +52,7 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         if (work){
             ans = new Ack(opcode);
             userName = "";
+            this.shouldTerminate = true;
         }
         else{
             ans = new ErrorMessage(opcode);
@@ -162,7 +163,7 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
             Message PM = new NotificationMessage((byte) (0), userName, newContent);
             User user = this.dataBase.getUser(userName);
             if(user.getLog())
-                connections.send(myId,PM);
+                connections.send(user.getConnectionId(), PM);
             else
                 user.addWaitingMsg(PM);
 
@@ -172,7 +173,7 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
     }
 
     private String filter(String content){
-        List<String> filtered = this.dataBase.getFilteredWords();
+        Queue<String> filtered = this.dataBase.getFilteredWords();
         String ans = content;
         for(String word:filtered){
             ans = ans.replace(word,"<filtered>");
@@ -209,13 +210,4 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         return this.shouldTerminate;
     }
 
-
-    public static void main(String[] args) {
-        DataBase data = new DataBase();
-        data.addFilteredWords("abc");
-        String ans = "abc kk abc lmno";
-        BidiMessagingProtocolImp bidiMessagingProtocol = new BidiMessagingProtocolImp(data);
-        ans = bidiMessagingProtocol.filter(ans);
-        System.out.println(ans);
-    }
 }
