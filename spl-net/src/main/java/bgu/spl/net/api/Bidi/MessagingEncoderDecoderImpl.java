@@ -49,9 +49,9 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
             args.add(new String(bytes, idx, i - idx , StandardCharsets.UTF_8));
             idx = i + 1;
             i = findNextZero(idx);
-            System.out.println("i: " + i);
-            System.out.println("idx: " + idx);
-            System.out.println("size: " + size);
+        }
+        for (int j = 0; j < args.size(); j++){
+            System.out.println(args.get(j));
         }
         return args;
     }
@@ -65,7 +65,6 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
         opcode += (short)(bytes[1] & 0xff);
         System.out.println("making new message with opCode: " + opcode);
         List<String> args = makeArgs();
-
         if(opcode == 1){
             message = new RegisterMessage(args.get(0),args.get(1),args.get(2));
         }
@@ -103,17 +102,20 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
             String userName = "";
 
             for (int i = 0; i < users.length(); i++){ //make list of userNames for StatsRequestMessage
-                if (users.indexOf(i) == '|'){
+                if (users.charAt(i) == '|'){
                     listUsers.add(userName);
                     userName = "";
-                    i++;
                 }
                 else{
-                    userName = userName + users.indexOf(i);
+                    userName = userName + users.charAt(i);
                 }
             }
 
             message = new StatsRequestMessage(listUsers);
+        }
+
+        if (opcode == 12){
+            message = new Block( new String(bytes, 2, size - 2, StandardCharsets.UTF_8));
         }
 
         len = 0;
@@ -133,18 +135,18 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
     }
 
     public static void main(String[] args) {
-        MessagingEncoderDecoderImpl m = new MessagingEncoderDecoderImpl();
-        Integer age = 3;
-        Integer numOfPosts = 5;
-        Integer numFollowing = 7;
-        Integer numFollowers = 1;
-        Message msg = new AckUserInfo((short)9 , age.shortValue(),numFollowing.shortValue(),numFollowers.shortValue());
-        byte[] ans = m.encode(msg);
-        String ans1 ="";
-        for(Byte b:ans) {
-            System.out.print(b);
-            ans1 = (String) m.decodeNextByte(b);
-        }
-        System.out.println(ans1);
+// Integer age = 3;
+////        Integer numOfPosts = 5;
+////        Integer numFollowing = 7;
+////        Integer numFollowers = 1;
+//////        Message msg = new AckUserInfo((short)9 , age.shortValue(),numFollowing.shortValue(),numFollowers.shortValue());
+//////        byte[] ans = m.encode(msg);
+////        String ans1 ="";
+////        for(Byte b:ans) {
+////            System.out.print(b);
+////            ans1 = (String) m.decodeNextByte(b);
+////        }
+////        System.out.println(ans1);       MessagingEncoderDecoderImpl m = new MessagingEncoderDecoderImpl();
+//
     }
 }
