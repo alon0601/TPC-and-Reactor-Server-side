@@ -2,6 +2,8 @@ package bgu.spl.net.Datas;
 
 import bgu.spl.net.api.Bidi.Messages.Message;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Queue;
@@ -115,11 +117,13 @@ public class User {
     }
 
     public void removeFollower(User follower){
-        this.followers.remove(follower);
+        if (this.followers.contains(follower))
+            this.followers.remove(follower);
     }
 
     public  void removeFollowing(User following){
-        this.following.remove(following);
+        if (this.following.contains(following))
+            this.following.remove(following);
     }
 
     public void removeWaitingMsg(Message message){
@@ -130,19 +134,21 @@ public class User {
 
     public boolean isFollowed(User user){return this.followers.contains(user);}
 
-    public short getAge(){
-        Calendar bday = Calendar.getInstance();
-        Calendar now = Calendar.getInstance();
+    public short getAge() {
+        int d = Integer.parseInt(this.birthDay.substring(0,2));
+        int m = Integer.parseInt(this.birthDay.substring(3,5));
+        int y = Integer.parseInt(this.birthDay.substring(6));
+        LocalDate birthDate = LocalDate.of(y, m, d);
+        int actual = calculateAge(birthDate, LocalDate.now());
+        return (short) actual;
+    }
 
-        bday.set(Integer.parseInt(this.birthDay.substring(0,2)), Integer.parseInt(this.birthDay.substring(3,5)), Integer.parseInt(this.birthDay.substring(6))); //very bad way
-
-        int age = now.get(Calendar.YEAR) - bday.get(Calendar.YEAR);
-
-        if (now.get(Calendar.DAY_OF_YEAR) < bday.get(Calendar.DAY_OF_YEAR)){
-            age--;
+    private int calculateAge(LocalDate birthDate, LocalDate currentDate) {
+        if ((birthDate != null) && (currentDate != null)) {
+            return Period.between(birthDate, currentDate).getYears();
+        } else {
+            return 0;
         }
-
-        return (short)age;
     }
 
     public short getNumOfFollowers(){
@@ -155,5 +161,8 @@ public class User {
 
     public void setConnectionId(int id){
         this.connectionId = id;
+    }
+
+    public short getNumOfPosts() {return (short)this.posts.size();
     }
 }

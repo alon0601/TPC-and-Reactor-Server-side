@@ -24,7 +24,7 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
     public void start(int connectionId, Connections connections) {
         this.connections = connections;
         this.myId = connectionId;
-        userName = "";
+        this.userName = "";
     }
 
     @Override
@@ -59,13 +59,18 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         }
 
         this.connections.send(this.myId, ans);
+        if(work)
+            this.connections.disconnect(this.myId);
     }
 
-    public void logStat(short opcode){
+    public void logStat(short opcode) {
         while (!dataBase.connectedUsers().isEmpty()) { //if users getting loged all the time we will not get out of this loop!
             User user = dataBase.connectedUsers().poll();
-            Message userDataAck = new AckUserInfo(opcode,user.getAge(), user.getNumOfFollowers(),user.getNumOfFollowing());
-            connections.send(this.myId, userDataAck);
+            User meUser = dataBase.getUser(this.userName);
+            if(!meUser.isBlocked(user) && !user.isBlocked(meUser)) {
+                Message userDataAck = new AckUserInfo(opcode, user.getAge(), user.getNumOfFollowers(), user.getNumOfFollowing(), user.getNumOfPosts());
+                connections.send(this.myId, userDataAck);
+            }
         }
     }
 
@@ -104,7 +109,7 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
     private Queue<String> tagged(String content){
         Queue<String> tag = new ConcurrentLinkedDeque<>();
         for (int i = 0; i < content.length(); i++){
-            if (content.indexOf(i) == '@'){
+            if (content.charAt(i) == '@'){
                 String name = getTaggedName(content, i);
                 tag.add(name);
                 i = i + name.length();
@@ -117,32 +122,35 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         String name = "";
         int i = idx + 1;
         while (i < content.length()){
-            if (content.indexOf(i) == ' '){
+            if (content.charAt(i) == ' '){
                 return name;
             }
             else{
-                name = name + content.indexOf(i);
+                name = name + content.charAt(i);
                 i++;
             }
         }
         return name;
     }
 
-    public void logIn(short opcode,String userName,String password){
-        this.userName = userName;
-        boolean work = true;
-        work = dataBase.logInRe(userName,password);
-        if(work) {
-            connections.send(myId, new Ack(opcode));
-            User user =this.dataBase.getUser(this.userName);
-            user.setConnectionId(this.myId);
-            for(Message msg:user.getWaitingMessages()){
-                connections.send(myId, msg);
-            }
-            user.getWaitingMessages().clear();
+    public void logIn(short opcode,String userName,String password,short capcha){
+        if(capcha -'0' == 1 && this.userName == "") {
+            this.userName = userName;
+            boolean work = true;
+            work = dataBase.logInRe(userName, password);
+            if (work) {
+                connections.send(myId, new Ack(opcode));
+                User user = this.dataBase.getUser(this.userName);
+                user.setConnectionId(this.myId);
+                for (Message msg : user.getWaitingMessages()) {
+                    connections.send(myId, msg);
+                }
+                user.getWaitingMessages().clear();
+            } else
+                connections.send(myId, new ErrorMessage(opcode));
         }
         else
-            connections.send(myId,new ErrorMessage(opcode));
+            connections.send(myId, new ErrorMessage(opcode));
     }
 
     public void follow(short opcode, byte follow, String userName) {
@@ -166,7 +174,6 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
                 connections.send(user.getConnectionId(), PM);
             else
                 user.addWaitingMsg(PM);
-
         }
         else
             this.connections.send(myId,new ErrorMessage(opcode));
@@ -182,12 +189,13 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
     }
 
     public void stat(short opcode,List<String> usernames) {
-        if(dataBase.getUser(this.userName) == null)
+        if(dataBase.getUser(this.userName) == null || !this.dataBase.isAllExist(usernames,this.userName))
             connections.send(myId,new ErrorMessage(opcode));
         else {
+            int i = 0;
             while (!usernames.isEmpty()) {
-                User user = dataBase.connectedUsers().poll();
-                Message userDataAck = new AckUserInfo(opcode,user.getAge(), user.getNumOfFollowers(), user.getNumOfFollowing());
+                User user = dataBase.getUser(usernames.remove(i));
+                Message userDataAck = new AckUserInfo(opcode,user.getAge(),user.getNumOfPosts() ,user.getNumOfFollowers(), user.getNumOfFollowing());
                 connections.send(this.myId, userDataAck);
             }
         }
@@ -195,8 +203,6 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
 
     public void block(short opcode,String blocked) {
         boolean work = this.dataBase.block(this.userName,blocked);
-        User user = this.dataBase.getUser(this.userName);
-        User block = this.dataBase.getUser(blocked);
         if(work){
             connections.send(this.myId,new Ack(opcode));
         }

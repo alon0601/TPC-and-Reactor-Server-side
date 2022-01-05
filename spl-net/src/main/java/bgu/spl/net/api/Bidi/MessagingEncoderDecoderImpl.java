@@ -3,6 +3,7 @@ package bgu.spl.net.api.Bidi;
 import bgu.spl.net.api.Bidi.Messages.*;
 import bgu.spl.net.api.MessageEncoderDecoder;
 
+
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLOutput;
 import java.sql.Time;
@@ -81,7 +82,8 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
         }
 
         if (opcode == 5){
-            message = new PostMessages(args.get(0));
+            String post = new String(bytes, 2, size - 2, StandardCharsets.UTF_8);
+            message = new PostMessages(post);
         }
 
         if (opcode == 6){
@@ -98,17 +100,18 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
             String userName = "";
 
             for (int i = 0; i < users.length(); i++){ //make list of userNames for StatsRequestMessage
-                if (users.indexOf(i) == '|'){
+                if (users.charAt(i) == '|'){
                     listUsers.add(userName);
                     userName = "";
-                    i++;
                 }
                 else{
-                    userName = userName + users.indexOf(i);
+                    userName = userName + users.charAt(i);
                 }
             }
-
             message = new StatsRequestMessage(listUsers);
+        }
+        if(opcode == 12){
+            message = new Block(args.get(0));
         }
 
         len = 0;

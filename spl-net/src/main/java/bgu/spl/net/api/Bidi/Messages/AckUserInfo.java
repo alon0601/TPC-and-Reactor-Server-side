@@ -9,9 +9,10 @@ public class AckUserInfo extends Ack{
     short numFollowers;
     short numFollowing;
 
-    public AckUserInfo(short opcode,short age, short numFollowers ,short numFollowing) {
+    public AckUserInfo(short opcode,short age,short numPosts ,short numFollowers ,short numFollowing) {
         super(opcode);
         this.age = age;
+        this.numPosts = numPosts;
         this.numFollowers = numFollowers;
         this.numFollowing = numFollowing;
     }

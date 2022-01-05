@@ -34,16 +34,22 @@ public class NotificationMessage implements Message{
 
     @Override
     public byte[] serialize() {
-        byte[] bytes = new byte[3];
-        bytes[0] = (byte)((opcode >> 8) & 0xFF);
-        bytes[1] = (byte)(opcode & 0xFF);
-        bytes[2] = this.type;
-        byte[] content = new byte[this.content.length()];
-        content = this.content.getBytes();
-        byte[] user = new byte[this.postingUser.length()];
-        user = this.postingUser.getBytes();
-        byte[] reg = allBytes(bytes,user);
-        return allBytes(reg,content);
+        byte[] zero = new byte[1];
+        zero[0] = '\0';
+
+        byte[] opCodeBytes = new byte[3];
+        opCodeBytes[0] = (byte)((opcode >> 8) & 0xFF);
+        opCodeBytes[1] = (byte)(opcode & 0xFF);
+        opCodeBytes[2] = this.type; //adding the type
+
+        byte[] postingUserBytes = this.postingUser.getBytes();
+        byte[] contentBytes = content.getBytes();
+
+        byte[] arrToPostUser = allBytes(opCodeBytes,postingUserBytes); //arr to the PostUser
+        byte[] zero1 = allBytes(arrToPostUser,zero); //arr until the first zero
+        byte[] arrToContent = allBytes(zero1,contentBytes); //arr until the Content
+
+        return allBytes(arrToContent,zero);
     }
 
     @Override

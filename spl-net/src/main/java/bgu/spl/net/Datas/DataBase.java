@@ -105,9 +105,17 @@ public class DataBase {
     public boolean addPM(String sendName, String receiveName, String content){
         User user = this.users.get(receiveName);
         User send = this.users.get(sendName);
-        if(user == null || send == null || send.isFollowing(user))
+        if(user == null || send == null || !send.isFollowing(user))
             return false;
         user.addPMMsg(content);
+        return true;
+    }
+
+    public boolean isAllExist(List<String> userNames,String myUserName){
+        for(String s:userNames){
+            if (!this.users.containsKey(s) || this.users.get(s).isBlocked(this.users.get(myUserName)) || this.users.get(myUserName).isBlocked(this.users.get(s)))
+                return false;
+        }
         return true;
     }
 
