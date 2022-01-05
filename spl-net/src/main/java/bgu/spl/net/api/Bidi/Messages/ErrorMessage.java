@@ -18,6 +18,7 @@ public class ErrorMessage implements Message{
 
     @Override
     public byte[] serialize() {
+        System.out.println("sending error");
         byte[] bytes = new byte[4];
         bytes[0] = (byte)((opcode >> 8) & 0xFF);
         bytes[1] = (byte)(opcode & 0xFF);

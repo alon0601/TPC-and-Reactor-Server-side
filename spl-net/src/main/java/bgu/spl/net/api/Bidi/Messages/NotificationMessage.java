@@ -2,24 +2,11 @@ package bgu.spl.net.api.Bidi.Messages;
 
 import bgu.spl.net.api.Bidi.BidiMessagingProtocolImp;
 
-import java.nio.charset.StandardCharsets;
-
 public class NotificationMessage implements Message{
     private short opcode = 9;
     private byte type;
     private String postingUser;
     private String content;
-
-    protected byte[] allBytes(byte[] b1, byte[] b2){ //adding 2 different byte[] to a single byte[]
-        byte[] allBytes = new byte[b1.length + b2.length];
-        for (int i = 0; i < b1.length; i++){
-            allBytes[i] = b1[i];
-        }
-        for (int i = 0; i < b2.length; i++){
-            allBytes[i + b1.length] = b2[i];
-        }
-        return allBytes;
-    }
 
     public NotificationMessage(byte _type,String _postingUser,String _content){
         this.type = _type;
@@ -50,17 +37,22 @@ public class NotificationMessage implements Message{
         byte[] arrToContent = allBytes(zero1,contentBytes); //arr until the Content
 
         return allBytes(arrToContent,zero);
+
     }
 
     @Override
     public void act(BidiMessagingProtocolImp myProtocol) {
 
     }
-    public byte[] shortToBytes(short num)
-    {
-        byte[] bytesArr = new byte[2];
-        bytesArr[0] = (byte)((num >> 8) & 0xFF);
-        bytesArr[1] = (byte)(num & 0xFF);
-        return bytesArr;
+
+    protected byte[] allBytes(byte[] b1, byte[] b2){ //adding 2 different byte[] to a single byte[]
+        byte[] allBytes = new byte[b1.length + b2.length];
+        for (int i = 0; i < b1.length; i++){
+            allBytes[i] = b1[i];
+        }
+        for (int i = 0; i < b2.length; i++){
+            allBytes[i + b1.length] = b2[i];
+        }
+        return allBytes;
     }
 }

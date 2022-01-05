@@ -6,6 +6,7 @@ import bgu.spl.net.api.Bidi.BidiMessagingProtocol;
 import bgu.spl.net.api.Bidi.Connections;
 import bgu.spl.net.api.Bidi.Messages.*;
 
+import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -18,13 +19,14 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
 
     public  BidiMessagingProtocolImp(DataBase data){
         this.dataBase = data;
+        this.userName = "";
     }
 
     @Override
     public void start(int connectionId, Connections connections) {
         this.connections = connections;
         this.myId = connectionId;
-        this.userName = "";
+        userName = "";
     }
 
     @Override
@@ -59,7 +61,8 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         }
 
         this.connections.send(this.myId, ans);
-        if(work)
+
+        if (work)
             this.connections.disconnect(this.myId);
     }
 
@@ -103,6 +106,10 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
                     }
                 }
             }
+            connections.send(this.myId,new Ack(opcode));
+        }
+        else{
+            connections.send(this.myId,new ErrorMessage(opcode));
         }
     }
 
@@ -133,8 +140,8 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         return name;
     }
 
-    public void logIn(short opcode,String userName,String password,short capcha){
-        if(capcha -'0' == 1 && this.userName == "") {
+    public void logIn(short opcode,String userName,String password, short capcha) {
+        if (capcha - '0' == 1 && this.userName == "") {
             this.userName = userName;
             boolean work = true;
             work = dataBase.logInRe(userName, password);
@@ -149,8 +156,9 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
             } else
                 connections.send(myId, new ErrorMessage(opcode));
         }
-        else
+        else{
             connections.send(myId, new ErrorMessage(opcode));
+        }
     }
 
     public void follow(short opcode, byte follow, String userName) {
@@ -171,16 +179,17 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
             Message PM = new NotificationMessage((byte) (0), userName, newContent);
             User user = this.dataBase.getUser(userName);
             if(user.getLog())
-                connections.send(user.getConnectionId(), PM);
+                connections.send(user.getConnectionId(),PM);
             else
                 user.addWaitingMsg(PM);
+
         }
         else
             this.connections.send(myId,new ErrorMessage(opcode));
     }
 
     private String filter(String content){
-        Queue<String> filtered = this.dataBase.getFilteredWords();
+        List<String> filtered = this.dataBase.getFilteredWords();
         String ans = content;
         for(String word:filtered){
             ans = ans.replace(word,"<filtered>");
@@ -189,13 +198,12 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
     }
 
     public void stat(short opcode,List<String> usernames) {
-        if(dataBase.getUser(this.userName) == null || !this.dataBase.isAllExist(usernames,this.userName))
+        if(dataBase.getUser(this.userName) == null || !this.dataBase.isAllExist(usernames, this.userName))
             connections.send(myId,new ErrorMessage(opcode));
         else {
-            int i = 0;
             while (!usernames.isEmpty()) {
-                User user = dataBase.getUser(usernames.remove(i));
-                Message userDataAck = new AckUserInfo(opcode,user.getAge(),user.getNumOfPosts() ,user.getNumOfFollowers(), user.getNumOfFollowing());
+                User user = dataBase.getUser(usernames.remove(0));
+                Message userDataAck = new AckUserInfo(opcode,user.getAge(), user.getNumOfFollowers(), user.getNumOfFollowing(), user.getNumOfPosts());
                 connections.send(this.myId, userDataAck);
             }
         }
@@ -203,6 +211,7 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
 
     public void block(short opcode,String blocked) {
         boolean work = this.dataBase.block(this.userName,blocked);
+
         if(work){
             connections.send(this.myId,new Ack(opcode));
         }
@@ -216,4 +225,13 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         return this.shouldTerminate;
     }
 
+
+    public static void main(String[] args) {
+        DataBase data = new DataBase();
+        data.addFilteredWords("abc");
+        String ans = "abc kk abc lmno";
+        BidiMessagingProtocolImp bidiMessagingProtocol = new BidiMessagingProtocolImp(data);
+        ans = bidiMessagingProtocol.filter(ans);
+        System.out.println(ans);
+    }
 }

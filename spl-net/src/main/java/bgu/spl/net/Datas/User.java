@@ -2,9 +2,12 @@ package bgu.spl.net.Datas;
 
 import bgu.spl.net.api.Bidi.Messages.Message;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -150,7 +153,7 @@ public class User {
             return 0;
         }
     }
-
+    public short getNumOfPosts() {return (short)(this.posts.size());}
     public short getNumOfFollowers(){
         return (short)(this.followers.size());
     }
@@ -161,8 +164,5 @@ public class User {
 
     public void setConnectionId(int id){
         this.connectionId = id;
-    }
-
-    public short getNumOfPosts() {return (short)this.posts.size();
     }
 }
