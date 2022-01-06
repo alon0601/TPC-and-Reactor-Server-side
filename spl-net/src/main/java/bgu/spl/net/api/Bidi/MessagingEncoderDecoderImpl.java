@@ -83,9 +83,7 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
         }
 
         if (opcode == 5){
-            String post = new String(bytes, 2, size - 2, StandardCharsets.UTF_8);
-            System.out.println(post);
-            message = new PostMessages(post);
+            message = new PostMessages(args.get(0));
         }
 
         if (opcode == 6){
@@ -115,7 +113,7 @@ public class MessagingEncoderDecoderImpl implements MessageEncoderDecoder {
         }
 
         if (opcode == 12){
-            message = new Block( new String(bytes, 2, size - 2, StandardCharsets.UTF_8));
+            message = new Block(args.get(0));
         }
 
         len = 0;

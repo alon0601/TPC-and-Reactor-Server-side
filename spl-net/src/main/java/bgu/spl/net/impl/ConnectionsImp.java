@@ -35,7 +35,7 @@ public class ConnectionsImp implements Connections {
         this.connectionMap.remove(connId);
     }
 
-    public synchronized void connect(int id, ConnectionHandler con){
+    public void connect(int id, ConnectionHandler con){
         this.connectionMap.put(id,con);
     }
 

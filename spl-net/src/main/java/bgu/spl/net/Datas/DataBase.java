@@ -1,12 +1,11 @@
 package bgu.spl.net.Datas;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.*;
 
 public class DataBase {
     private Map<String,User> users;
-    private Queue<User> loggedInUsers;
+    private BlockingDeque<User> loggedInUsers;
     private Queue<String> filteredWords;
     private static DataBase dataBase = null;
 
@@ -19,8 +18,10 @@ public class DataBase {
 
     private DataBase(){
         users = new ConcurrentHashMap<>();
-        loggedInUsers = new ConcurrentLinkedQueue<>();
+        loggedInUsers = new LinkedBlockingDeque<>();
         filteredWords = new ConcurrentLinkedQueue<>();
+        addFilteredWords("FUCK");
+        addFilteredWords("MOM");
     }
 
 
@@ -47,11 +48,13 @@ public class DataBase {
 
     public boolean logOutRe(String userName){
         User user = users.get(userName);
-        if(user == null || !user.getLog())
-            return false;
-        user.logOut();
-        loggedInUsers.remove(user);
-        return true;
+        synchronized (user) {
+            if (user == null || !user.getLog())
+                return false;
+            user.logOut();
+            loggedInUsers.remove(user);
+            return true;
+        }
     }
 
     public boolean follow(byte follow,String userMe,String otherUser){
@@ -59,7 +62,7 @@ public class DataBase {
         User userOther = users.get(otherUser);
         if(meUser == null || userOther == null || !meUser.getLog())
             return false;
-        if(follow - '0' == 1){
+        if(follow - '0' == 0){
             if(meUser.isFollowing(userOther) || meUser.isBlocked(userOther) || userOther.isBlocked(meUser)){ //check if blocked him
                 return false;
             }
@@ -119,7 +122,7 @@ public class DataBase {
         return true;
     }
 
-    public Queue<User> connectedUsers(){
+    public BlockingDeque<User> connectedUsers(){
         return loggedInUsers;
     }
 

@@ -36,7 +36,6 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
     }
 
     public void register(short opcode, String userName, String password, String bday){
-
         Message ans;
         boolean work  = this.dataBase.register(userName,password,bday);
         if (work){
@@ -59,19 +58,16 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         else{
             ans = new ErrorMessage(opcode);
         }
-
         this.connections.send(this.myId, ans);
-
         if (work)
             this.connections.disconnect(this.myId);
     }
 
     public void logStat(short opcode) {
-        while (!dataBase.connectedUsers().isEmpty()) { //if users getting loged all the time we will not get out of this loop!
-            User user = dataBase.connectedUsers().poll();
-            User meUser = dataBase.getUser(this.userName);
+        User meUser = dataBase.getUser(this.userName);
+        for(User user:dataBase.connectedUsers()){ //if users getting loged all the time we will not get out of this loop!
             if(!meUser.isBlocked(user) && !user.isBlocked(meUser)) {
-                Message userDataAck = new AckUserInfo(opcode, user.getAge(), user.getNumOfFollowers(), user.getNumOfFollowing(), user.getNumOfPosts());
+                Message userDataAck = new AckUserInfo(opcode, user.getAge(), user.getNumOfPosts(), user.getNumOfFollowers(), user.getNumOfFollowing());
                 connections.send(this.myId, userDataAck);
             }
         }
@@ -82,27 +78,27 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
             User user = dataBase.getUser(userName);
             dataBase.addPost(userName,content);
             Message post = new NotificationMessage((byte)(1), userName, content);
-
             //sending to followers
             for (User follower: user.getFollowers()){
-                if (follower.getLog()){
-                    connections.send(follower.getConnectionId(),post);
-                }
-                else{
-                    follower.addWaitingMsg(post);
+                synchronized (follower) {
+                    if (follower.getLog()) {
+                        connections.send(follower.getConnectionId(), post);
+                    } else {
+                        follower.addWaitingMsg(post);
+                    }
                 }
             }
-
             //sending to tagged
             Queue<String> tagged = tagged(content);
             for (String name : tagged){
                 User tagUser = dataBase.getUser(name);
-                if (tagUser != null && !user.getFollowers().contains(tagUser) && !tagUser.isBlocked(user)){ //check if not null and didnt send already and didnt block me
-                    if (tagUser.getLog()){
-                        connections.send(tagUser.getConnectionId(),post);
-                    }
-                    else{
-                        tagUser.addWaitingMsg(post);
+                synchronized (tagUser) {
+                    if (tagUser != null && !user.getFollowers().contains(tagUser) && !tagUser.isBlocked(user)) { //check if not null and didnt send already and didnt block me
+                        if (tagUser.getLog()) {
+                            connections.send(tagUser.getConnectionId(), post);
+                        } else {
+                            tagUser.addWaitingMsg(post);
+                        }
                     }
                 }
             }
@@ -176,7 +172,7 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         work = dataBase.addPM(this.userName,userName,content);
         //sending to otherUser
         if(work) {
-            Message PM = new NotificationMessage((byte) (0), userName, newContent);
+            Message PM = new NotificationMessage((byte) (0), this.userName, newContent);
             User user = this.dataBase.getUser(userName);
             if(user.getLog())
                 connections.send(user.getConnectionId(),PM);
@@ -189,7 +185,7 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
     }
 
     private String filter(String content){
-        List<String> filtered = this.dataBase.getFilteredWords();
+        Queue<String> filtered = this.dataBase.getFilteredWords();
         String ans = content;
         for(String word:filtered){
             ans = ans.replace(word,"<filtered>");
@@ -211,7 +207,6 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
 
     public void block(short opcode,String blocked) {
         boolean work = this.dataBase.block(this.userName,blocked);
-
         if(work){
             connections.send(this.myId,new Ack(opcode));
         }
@@ -225,13 +220,4 @@ public class BidiMessagingProtocolImp implements BidiMessagingProtocol {
         return this.shouldTerminate;
     }
 
-
-    public static void main(String[] args) {
-        DataBase data = new DataBase();
-        data.addFilteredWords("abc");
-        String ans = "abc kk abc lmno";
-        BidiMessagingProtocolImp bidiMessagingProtocol = new BidiMessagingProtocolImp(data);
-        ans = bidiMessagingProtocol.filter(ans);
-        System.out.println(ans);
-    }
 }
